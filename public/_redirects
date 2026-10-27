@@ -1,0 +1,6 @@
+# SPA fallback: client-side routes (including /privacy, /terms, /contact)
+# resolve through index.html. Real static files (sitemap.xml,
+# netlify-forms.html, favicon.svg) are served directly before this rule.
+# Unknown paths still serve index.html, where the React catch-all route
+# renders the real 404 page.
+/*  /index.html  200

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>LeakStack.io — Form Definitions</title>
+  </head>
+  <body>
+    <!--
+      Static form definitions for Netlify Forms detection. This is an SPA:
+      the visible email modals submit via fetch, but Netlify only registers a
+      form if a matching <form data-netlify="true"> exists in the deployed
+      files. These hidden definitions provide that match. They are never
+      linked from the site UI.
+    -->
+    <form name="leak-detector" data-netlify="true" hidden>
+      <input type="email" name="email" />
+      <input type="text" name="tool" />
+    </form>
+    <form name="mortgage" data-netlify="true" hidden>
+      <input type="email" name="email" />
+      <input type="text" name="tool" />
+    </form>
+    <form name="credit-damage" data-netlify="true" hidden>
+      <input type="email" name="email" />
+      <input type="text" name="tool" />
+    </form>
+    <form name="excuse-generator" data-netlify="true" hidden>
+      <input type="email" name="email" />
+      <input type="text" name="tool" />
+    </form>
+    <form name="contact" data-netlify="true" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <textarea name="message"></textarea>
+    </form>
+  </body>
+</html>
