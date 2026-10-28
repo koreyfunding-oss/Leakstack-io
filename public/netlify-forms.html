@@ -9,29 +9,34 @@
       Static form definitions for Netlify Forms detection. This is an SPA:
       the visible email modals submit via fetch, but Netlify only registers a
       form if a matching <form data-netlify="true"> exists in the deployed
-      files. These hidden definitions provide that match. They are never
+      files. These static definitions provide that match. They are never
       linked from the site UI.
     -->
-    <form name="leak-detector" data-netlify="true">
+    <form name="leak-detector" method="POST" data-netlify="true">
       <input type="email" name="email" />
       <input type="text" name="tool" />
+          <button type="submit">Submit</button>
     </form>
-    <form name="mortgage" data-netlify="true">
+    <form name="mortgage" method="POST" data-netlify="true">
       <input type="email" name="email" />
       <input type="text" name="tool" />
+          <button type="submit">Submit</button>
     </form>
-    <form name="credit-damage" data-netlify="true">
+    <form name="credit-damage" method="POST" data-netlify="true">
       <input type="email" name="email" />
       <input type="text" name="tool" />
+          <button type="submit">Submit</button>
     </form>
-    <form name="excuse-generator" data-netlify="true">
+    <form name="excuse-generator" method="POST" data-netlify="true">
       <input type="email" name="email" />
       <input type="text" name="tool" />
+          <button type="submit">Submit</button>
     </form>
-    <form name="contact" data-netlify="true">
+    <form name="contact" method="POST" data-netlify="true">
       <input type="text" name="name" />
       <input type="email" name="email" />
       <textarea name="message"></textarea>
+          <button type="submit">Submit</button>
     </form>
   </body>
 </html>
