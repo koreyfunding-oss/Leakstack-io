@@ -22,6 +22,8 @@ export default function LeakDetector() {
   });
   const [showModal, setShowModal] = useState(false);
   const [result, setResult] = useState(null);
+  const [leadEmail, setLeadEmail] = useState("");
+  const [auditState, setAuditState] = useState("idle"); // idle | sending | done | error
 
   const set = (key, value) => setInput((v) => ({ ...v, [key]: value }));
 
@@ -31,9 +33,44 @@ export default function LeakDetector() {
     setShowModal(true);
   };
 
-  const handleUnlock = () => {
+  const handleUnlock = (email) => {
+    setLeadEmail(email);
     setResult(calcLeak(input));
     setShowModal(false);
+  };
+
+  // One-tap audit request: reuses the email already captured at the gate,
+  // so the visitor never re-types anything or leaves the results page.
+  // Unlike the email gate, a failed POST must NOT fake success — a lost
+  // audit request is a lost hot lead, so failure shows a retry instead.
+  const handleAuditRequest = async () => {
+    if (auditState === "sending" || auditState === "done" || !result) return;
+    setAuditState("sending");
+    try {
+      const res = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          "form-name": "audit-request",
+          email: leadEmail,
+          tool: "leak-detector",
+          monthly_leak: String(Math.round(result.monthlyLeak)),
+          annual_leak: String(Math.round(result.yearlyLeak)),
+          severity: String(result.severity),
+          problems: result.problems.join(" | "),
+        }).toString(),
+      });
+      if (!res.ok) throw new Error(`audit POST ${res.status}`);
+      setAuditState("done");
+    } catch {
+      setAuditState("error");
+    }
+  };
+
+  const handleStartOver = () => {
+    setResult(null);
+    setLeadEmail("");
+    setAuditState("idle");
   };
 
   return (
@@ -95,20 +132,54 @@ export default function LeakDetector() {
               ))}
             </ul>
           </div>
-          <div className="card border-electric/30 bg-electric/5 text-center py-8">
-            <p className="text-gray-400 text-sm mb-2">Ready to plug the leaks for good?</p>
-            <h3 className="text-2xl font-black text-white mb-4">Get a Free Leak Audit from SYCCO</h3>
-            <a
-              href="https://sycco.ai"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary inline-flex items-center justify-center gap-2 max-w-xs mx-auto"
-            >
-              Book My Free Audit <ArrowRight size={16} />
-            </a>
+          <div className="card border-electric/30 bg-electric/5 py-8">
+            <p className="text-gray-400 text-sm mb-2 text-center">Ready to plug the leaks for good?</p>
+            <h3 className="text-2xl font-black text-white mb-4 text-center">
+              Get a Free Leak Audit from SYCCO
+            </h3>
+            <ul className="flex flex-col gap-2 max-w-md mx-auto mb-2 text-left">
+              <li className="flex items-start gap-2 text-sm text-gray-300">
+                <span className="text-electric mt-0.5">→</span> Your numbers, reviewed — we start
+                from the {money(result.monthlyLeak)} a month you just saw, not a blank form.
+              </li>
+              <li className="flex items-start gap-2 text-sm text-gray-300">
+                <span className="text-electric mt-0.5">→</span> The biggest leaks first — your
+                costliest problems, in order.
+              </li>
+              <li className="flex items-start gap-2 text-sm text-gray-300">
+                <span className="text-electric mt-0.5">→</span> Your quick wins — what to fix
+                before anything big.
+              </li>
+            </ul>
+            <p className="text-gray-500 text-xs text-center mb-5">
+              One tap and we&apos;ll reach out to {leadEmail} — nothing else to fill in, no
+              call to book.
+            </p>
+            {auditState === "done" ? (
+              <p className="text-center text-electric font-bold">
+                Requested ✓ — we&apos;ll reach out to {leadEmail}.
+              </p>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={handleAuditRequest}
+                  disabled={auditState === "sending"}
+                  className="btn-primary inline-flex items-center justify-center gap-2 max-w-xs mx-auto disabled:opacity-60"
+                >
+                  {auditState === "sending" ? "Sending…" : "Request My Free Audit"}{" "}
+                  <ArrowRight size={16} />
+                </button>
+                {auditState === "error" && (
+                  <p className="text-red-400 text-xs text-center mt-3">
+                    Something went wrong — tap the button to try again.
+                  </p>
+                )}
+              </>
+            )}
           </div>
           <button
-            onClick={() => setResult(null)}
+            onClick={handleStartOver}
             className="text-gray-600 hover:text-gray-400 text-sm transition-colors"
           >
             ← Start Over
